@@ -49,6 +49,11 @@ public class TestRoverDirections {
             "'1,2,N', 'fffffffff', '5,8,S'",
             "'1,7,N', 'ffffff', '1,1,N'",
             "'1,7,N', 'ffffffffffff', '5,6,S'",
+            "'1,6,N', 'fffffffffffff', '5,8,S'",
+            "'1,4,N', 'fff', '1,1,N'",
+            "'1,4,N', 'ffff', '5,1,S'",
+            "'1,4,N', 'fffffff', '5,4,S'",
+            "'1,4,N', 'ffffffffffffffff', '1,4,N'",
 
     })
     void moveForward(String inputPosition,
@@ -63,7 +68,7 @@ public class TestRoverDirections {
         rover.setGridSize(gridSize);
         rover.executeCommand(command);
         //assertions,
-        Assertions.assertEquals(expectedNewPosition, rover.getActualPosition());
+        Assertions.assertEquals(expectedNewPosition, rover.getActualNewPosition());
 
     }
 

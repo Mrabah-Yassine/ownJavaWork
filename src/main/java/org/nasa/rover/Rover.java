@@ -2,13 +2,15 @@ package org.nasa.rover;
 
 public class Rover {
 
-    private String actualPosition;
+    private String actualNewPosition;
     private String direction;
 
     private int xCoordinate;
     private int yCoordinate;
 
     private int gridSize;
+
+    private String command;
 
     public Rover(String[] position) {
         this.xCoordinate = Integer.parseInt(position[0]);
@@ -21,41 +23,50 @@ public class Rover {
             throw new UnsupportedOperationException("Unable to move the rover from 0,0 coordinates " +
                     "because they are not defined");
         }
-        System.out.println("START");
-        int numberOfStepCommandsSent = command.length();
+        this.command = command;
+        int numberOfStepsSentByCommand = this.command.length();
 
-        if(yCoordinate == 1){
-            xCoordinate = calculateXCoordinate();
-            reverseDirection();
-            yCoordinate = numberOfStepCommandsSent;
-        }else{
-            for (int i = 0; i < numberOfStepCommandsSent; i++){
-                yCoordinate--;
+        if(numberOfStepsSentByCommand <= gridSize * 2 - 1 ){
+            setNewYCoordinateAfterCommandExecution(numberOfStepsSentByCommand);
+
+            if (isNorthPoleCrossed()) {
+                setNewRealPositionAfterCrossingPole();
             }
         }
 
-        if(yCoordinate <= 0){
-            xCoordinate = calculateXCoordinate();
-            reverseDirection();
-            yCoordinate = Math.abs(yCoordinate - 1);
-        }
 
 
-
-        actualPosition = String.format("%s,%s,%s", xCoordinate, yCoordinate, direction);
-        System.out.println("END");
+        actualNewPosition = String.format("%s,%s,%s", xCoordinate, yCoordinate, direction);
     }
 
-    private void reverseDirection() {
-        if(direction.equals("N")){
-            direction = "S";
-        }else{
-            direction = "N";
+
+    private void setNewYCoordinateAfterCommandExecution(int numberOfStepsSentByCommand) {
+        for (int i = 0; i < numberOfStepsSentByCommand; i++) {
+            yCoordinate--;
         }
     }
 
 
-    private int calculateXCoordinate() {
+    private boolean isNorthPoleCrossed() {
+        return yCoordinate <= 0;
+    }
+
+
+    private void setNewRealPositionAfterCrossingPole() {
+        xCoordinate = calculateNewXCoordinate();
+        direction = getNewDirection();
+        yCoordinate = Math.abs(yCoordinate - 1);
+    }
+
+    private String getNewDirection() {
+        if (direction.equals("N")) {
+            return "S";
+        }
+        return "N";
+    }
+
+
+    private int calculateNewXCoordinate() {
         if (xCoordinate >= 1 && xCoordinate <= gridSize / 2) {
             return xCoordinate + gridSize / 2;
         }
@@ -66,14 +77,12 @@ public class Rover {
     }
 
 
-
-
     private boolean areCoordinatesNotValid() {
         return this.xCoordinate == 0 || this.yCoordinate == 0;
     }
 
-    public String getActualPosition() {
-        return actualPosition;
+    public String getActualNewPosition() {
+        return actualNewPosition;
     }
 
     public void setGridSize(int gridSize) {
