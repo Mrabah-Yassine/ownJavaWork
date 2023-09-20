@@ -2,7 +2,6 @@ package org.nasa.rover;
 
 public class Rover {
 
-    String actualFacedDirection = "N";
     private String actualPosition;
     private String direction;
 
@@ -11,10 +10,10 @@ public class Rover {
 
     private int gridSize;
 
-    public Rover(String[] position, String direction) {
+    public Rover(String[] position) {
         this.xCoordinate = Integer.parseInt(position[0]);
         this.yCoordinate = Integer.parseInt(position[1]);
-        this.direction = direction;
+        this.direction = position[2];
     }
 
     public void executeCommand(String command) {
@@ -22,50 +21,51 @@ public class Rover {
             throw new UnsupportedOperationException("Unable to move the rover from 0,0 coordinates " +
                     "because they are not defined");
         }
-
+        System.out.println("START");
         int numberOfStepCommandsSent = command.length();
 
-        if (yCoordinate == 1 && numberOfStepCommandsSent > 0) {
+        if(yCoordinate == 1){
+            xCoordinate = calculateXCoordinate();
+            reverseDirection();
+            yCoordinate = numberOfStepCommandsSent;
+        }else{
+            for (int i = 0; i < numberOfStepCommandsSent; i++){
+                yCoordinate--;
+            }
+        }
 
-            xCoordinate = calculateXCoordinate(numberOfStepCommandsSent);
-            yCoordinate = calculateYCoordinate(numberOfStepCommandsSent);
+        if(yCoordinate <= 0){
+            xCoordinate = calculateXCoordinate();
+            reverseDirection();
+            yCoordinate = Math.abs(yCoordinate - 1);
         }
 
 
+
         actualPosition = String.format("%s,%s,%s", xCoordinate, yCoordinate, direction);
+        System.out.println("END");
+    }
+
+    private void reverseDirection() {
+        if(direction.equals("N")){
+            direction = "S";
+        }else{
+            direction = "N";
+        }
     }
 
 
-    private int calculateXCoordinate(int numberOfStepCommandsSent) {
-        if (numberOfStepCommandsSent <= gridSize) {
-            direction = "S";
-            if (xCoordinate >= 1 && xCoordinate <= gridSize / 2) {
-                return xCoordinate + gridSize / 2;
-            }
-            if (xCoordinate > gridSize / 2 && xCoordinate <= gridSize) {
-                return xCoordinate - gridSize / 2;
-            }
+    private int calculateXCoordinate() {
+        if (xCoordinate >= 1 && xCoordinate <= gridSize / 2) {
+            return xCoordinate + gridSize / 2;
+        }
+        if (xCoordinate > gridSize / 2 && xCoordinate <= gridSize) {
+            return xCoordinate - gridSize / 2;
         }
         return xCoordinate;
     }
 
 
-    private int calculateYCoordinate(int numberOfStepCommandsSent) {
-
-        if (numberOfStepCommandsSent / gridSize > 1 && numberOfStepCommandsSent % gridSize == 0) {
-            return yCoordinate;
-        }
-        if (numberOfStepCommandsSent == gridSize || numberOfStepCommandsSent == gridSize + 1) {
-            return gridSize;
-        }
-        if (numberOfStepCommandsSent > gridSize + 1) {
-            return gridSize - (numberOfStepCommandsSent % gridSize) + 1;
-        }
-        if (numberOfStepCommandsSent > 1) {
-            return numberOfStepCommandsSent;
-        }
-        return yCoordinate;
-    }
 
 
     private boolean areCoordinatesNotValid() {
