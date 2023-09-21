@@ -5,16 +5,16 @@ public class Rover {
     private String actualNewPosition;
     private String direction;
 
-    private int xCoordinate;
-    private int yCoordinate;
+    private int longitude;
+    private int altitude;
 
     private int gridSize;
 
     private String command;
 
     public Rover(String[] position) {
-        this.xCoordinate = Integer.parseInt(position[0]);
-        this.yCoordinate = Integer.parseInt(position[1]);
+        this.longitude = Integer.parseInt(position[0]);
+        this.altitude = Integer.parseInt(position[1]);
         this.direction = position[2];
     }
 
@@ -24,38 +24,56 @@ public class Rover {
                     "because they are not defined");
         }
         this.command = command;
-        int numberOfStepsSentByCommand = this.command.length();
+        actualNewPosition = calculateAndGetNewPosition();
+    }
 
-        if(numberOfStepsSentByCommand <= gridSize * 2 - 1 ){
-            setNewYCoordinateAfterCommandExecution(numberOfStepsSentByCommand);
+    public String getNewActualPosition() {
+        return actualNewPosition;
+    }
 
-            if (isNorthPoleCrossed()) {
-                setNewRealPositionAfterCrossingPole();
-            }
-        }
-
-
-
-        actualNewPosition = String.format("%s,%s,%s", xCoordinate, yCoordinate, direction);
+    public void setGridSize(int gridSize) {
+        this.gridSize = gridSize;
     }
 
 
-    private void setNewYCoordinateAfterCommandExecution(int numberOfStepsSentByCommand) {
-        for (int i = 0; i < numberOfStepsSentByCommand; i++) {
-            yCoordinate--;
+    private String calculateAndGetNewPosition() {
+        int numberOfStepsSentByCommand = this.command.length();
+        if (numberOfStepsSentByCommand > 0) {
+            setNewAltitudeAfterCommandExecution(numberOfStepsSentByCommand);
+            setNewRealPositionIfNorthPoleIsCrossed();
+        }
+        return wrapPosition();
+    }
+
+
+    private String wrapPosition() {
+        return String.format("%s,%s,%s", longitude, altitude, direction);
+    }
+
+
+    private void setNewRealPositionIfNorthPoleIsCrossed() {
+        if (isNorthPoleCrossed()) {
+            setNewRealPositionAfterCrossingPole();
+        }
+    }
+
+
+    private void setNewAltitudeAfterCommandExecution(int numberOfStepsSentByCommand) {
+        for (int i = 0; i < numberOfStepsSentByCommand % (gridSize * 2); i++) {
+            altitude--;
         }
     }
 
 
     private boolean isNorthPoleCrossed() {
-        return yCoordinate <= 0;
+        return altitude <= 0;
     }
 
 
     private void setNewRealPositionAfterCrossingPole() {
-        xCoordinate = calculateNewXCoordinate();
+        longitude = getNewCalculatedLongitude();
         direction = getNewDirection();
-        yCoordinate = Math.abs(yCoordinate - 1);
+        altitude = Math.abs(altitude - 1);
     }
 
     private String getNewDirection() {
@@ -66,26 +84,20 @@ public class Rover {
     }
 
 
-    private int calculateNewXCoordinate() {
-        if (xCoordinate >= 1 && xCoordinate <= gridSize / 2) {
-            return xCoordinate + gridSize / 2;
+    private int getNewCalculatedLongitude() {
+        if (longitude >= 1 && longitude <= gridSize / 2) {
+            return longitude + gridSize / 2;
         }
-        if (xCoordinate > gridSize / 2 && xCoordinate <= gridSize) {
-            return xCoordinate - gridSize / 2;
+        if (longitude > gridSize / 2 && longitude <= gridSize) {
+            return longitude - gridSize / 2;
         }
-        return xCoordinate;
+        return longitude;
     }
 
 
     private boolean areCoordinatesNotValid() {
-        return this.xCoordinate == 0 || this.yCoordinate == 0;
+        return this.longitude == 0 || this.altitude == 0;
     }
 
-    public String getActualNewPosition() {
-        return actualNewPosition;
-    }
 
-    public void setGridSize(int gridSize) {
-        this.gridSize = gridSize;
-    }
 }

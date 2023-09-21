@@ -8,31 +8,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 public class TestRoverDirections {
 
-    Rover rover;
+    private Rover rover;
 
-
-/*
-    @ParameterizedTest(name = "{index} => position={0}, facedDirection={1}, command={2}, newPosition={3}")
-    @CsvSource({
-            "'0,0,N', 'f', '0,1,N'",
-            "'0,0,N', 'ff', '0,2,N'",
-            "'0,0,N', 'fff', '0,3,N'"
-    })
-    void givenZeroZeroCoordinatesAndNorthDirectionMoveForward(String position,
-                                                              String facedDirection,
-                                                              String command,
-                                                              String newPosition){
-        String[] positionArray = position.split(",");
-        rover = new Rover(positionArray, facedDirection);
-        //Position coordinates = new Position(0, 0);
-        rover.executeCommand(command);
-        //assertions,
-        Assertions.assertEquals(newPosition, rover.getActualPosition());
-    }*/
+    private final int gridSize = 8;
 
 
     @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
     @CsvSource({
+            "'1,8,N', '', '1,8,N'",
             "'1,8,N', 'f', '1,7,N'",
             "'1,8,N', 'ff', '1,6,N'",
             "'1,8,N', 'fff', '1,5,N'",
@@ -54,9 +37,13 @@ public class TestRoverDirections {
             "'1,4,N', 'ffff', '5,1,S'",
             "'1,4,N', 'fffffff', '5,4,S'",
             "'1,4,N', 'ffffffffffffffff', '1,4,N'",
+            "'1,4,N', 'fffffffffffffffff', '1,3,N'",
+            "'1,4,N', 'fffffffffffffffffffffff', '5,4,S'",
+            "'1,4,N', 'ffffffffffffffffffffffff', '5,5,S'",
+            "'1,8,N', 'fffffffffffffffffffffff', '1,1,N'",
 
     })
-    void moveForward(String inputPosition,
+    void givenInitialDirectionIsNorthThenMoveForward(String inputPosition,
                      String command,
                      String expectedNewPosition){
 
@@ -64,11 +51,11 @@ public class TestRoverDirections {
         String[] positionArray = inputPosition.split(",");
 
         rover = new Rover(positionArray);
-        int gridSize = 8;
+
         rover.setGridSize(gridSize);
         rover.executeCommand(command);
         //assertions,
-        Assertions.assertEquals(expectedNewPosition, rover.getActualNewPosition());
+        Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
 
     }
 
