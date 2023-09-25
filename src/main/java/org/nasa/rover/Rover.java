@@ -4,13 +4,17 @@ public class Rover {
 
     private String actualNewPosition;
     private String direction;
-
     private int longitude;
     private int altitude;
-
     private int gridSize;
-
     private String command;
+    private static int numberOfStepsSentByCommand;
+    private static final int NORTH_POLE_DEAD_POINT = 0;
+    private static int SOUTH_POLE_DEAD_POINT;
+    private static final int LONGITUDE_DEAD_VALUE = 0;
+    private int numberOfTimesPoleIsCrossed = 0;
+
+
 
     public Rover(String[] position) {
         this.longitude = Integer.parseInt(position[0]);
@@ -24,6 +28,7 @@ public class Rover {
                     "because they are not defined");
         }
         this.command = command;
+        numberOfStepsSentByCommand = getNumberOfCommandsSent();
         actualNewPosition = calculateAndGetNewPosition();
     }
 
@@ -33,16 +38,23 @@ public class Rover {
 
     public void setGridSize(int gridSize) {
         this.gridSize = gridSize;
+        SOUTH_POLE_DEAD_POINT = gridSize;
+    }
+
+    private int getNumberOfCommandsSent() {
+        return this.command.length();
+    }
+
+    private String calculateAndGetNewPosition() {
+        if (isThereAnyCommandSent()) {
+            setNewPositionAfterCommandExecution();
+        }
+        return wrapPosition();
     }
 
 
-    private String calculateAndGetNewPosition() {
-        int numberOfStepsSentByCommand = this.command.length();
-        if (numberOfStepsSentByCommand > 0) {
-            setNewAltitudeAfterCommandExecution(numberOfStepsSentByCommand);
-            setNewRealPositionIfNorthPoleIsCrossed();
-        }
-        return wrapPosition();
+    private boolean isThereAnyCommandSent() {
+        return numberOfStepsSentByCommand > 0;
     }
 
 
@@ -51,40 +63,162 @@ public class Rover {
     }
 
 
-    private void setNewRealPositionIfNorthPoleIsCrossed() {
-        if (isNorthPoleCrossed()) {
-            setNewRealPositionAfterCrossingPole();
+    private void setNewPositionAfterCommandExecution() {
+        for (Character commandStep : this.command.toCharArray()) {
+            setNewPositionAfterStepCommand(commandStep);
         }
     }
 
 
-    private void setNewAltitudeAfterCommandExecution(int numberOfStepsSentByCommand) {
-        for (int i = 0; i < numberOfStepsSentByCommand % (gridSize * 2); i++) {
+    enum Direction {
+        NORTH,
+        SOUTH,
+        EAST,
+        WEST
+    }
+
+
+    private void setNewPositionAfterStepCommand(Character stepCommand) {
+        if (isDirection("N")) {
+            if (stepCommand == 'l') {
+                this.direction = "W";
+                return;
+            }
+            if (stepCommand == 'r') {
+                this.direction = "E";
+                return;
+            }
+            if (stepCommand == 'f') {
+                goUp();
+                return;
+            }
+            if (stepCommand == 'b') {
+                goDown();
+                return;
+            }
+            return;
+        }
+        if (isDirection("S")) {
+            if (stepCommand == 'l') {
+                this.direction = "E";
+                return;
+            }
+            if (stepCommand == 'r') {
+                this.direction = "W";
+                return;
+            }
+            if (stepCommand == 'f') {
+                goDown();
+                return;
+            }
+            if (stepCommand == 'b') {
+                goUp();
+                return;
+            }
+            return;
+        }
+        if (isDirection("W")) {
+            if (stepCommand == 'l') {
+                this.direction = "S";
+                return;
+            }
+            if (stepCommand == 'r') {
+                this.direction = "N";
+                return;
+            }
+            if (stepCommand == 'b') {
+                longitude++;
+                longitude %= gridSize;
+                return;
+            }
+            if (stepCommand == 'f') {
+                longitude--;
+                if(isLongitudeDeadValueCrossed()){
+                    longitude = getNewLongitudeAfterCrossingDeadValue();
+                }
+            }
+            return;
+        }
+        if (isDirection("E")) {
+            if (stepCommand == 'l') {
+                this.direction = "N";
+                return;
+            }
+            if (stepCommand == 'r') {
+                this.direction = "S";
+                return;
+            }
+            if (stepCommand == 'f') {
+                longitude++;
+                longitude %= gridSize;
+                return;
+            }
+            if (stepCommand == 'b') {
+                longitude--;
+                if(isLongitudeDeadValueCrossed()){
+                    longitude = getNewLongitudeAfterCrossingDeadValue();
+                }
+            }
+        }
+    }
+
+
+    private boolean isLongitudeDeadValueCrossed(){
+        return longitude >= LONGITUDE_DEAD_VALUE;
+    }
+
+    private int getNewLongitudeAfterCrossingDeadValue(){
+        return gridSize - (longitude % gridSize);
+    }
+
+    /**
+     * Moving the rover towards the South Pole of the planet
+     */
+    private void goDown() {
+        altitude++;
+        if (isPoleCrossed()) {
             altitude--;
+            numberOfTimesPoleIsCrossed++;
+            changeLongitudeAndDirection();
         }
     }
 
+    /**
+     * Moving the rover towards the North Pole of the planet
+     */
+    private void goUp() {
+        altitude--;
+        if (isPoleCrossed()) {
+            altitude++;
+            numberOfTimesPoleIsCrossed++;
+            changeLongitudeAndDirection();
+        }
+    }
 
-    private boolean isNorthPoleCrossed() {
-        return altitude <= 0;
+    private boolean isPoleCrossed(){
+        return altitude > SOUTH_POLE_DEAD_POINT || altitude <= NORTH_POLE_DEAD_POINT;
     }
 
 
-    private void setNewRealPositionAfterCrossingPole() {
-        longitude = getNewCalculatedLongitude();
-        direction = getNewDirection();
-        altitude = Math.abs(altitude - 1);
+    private void changeLongitudeAndDirection() {
+        longitude = getNewLongitudeAfterCrossingPole();
+        direction = getNewDirectionAfterCrossingPole();
     }
 
-    private String getNewDirection() {
-        if (direction.equals("N")) {
+
+    private String getNewDirectionAfterCrossingPole() {
+        if (isDirection("N")) {
             return "S";
         }
         return "N";
     }
 
+    private boolean isDirection(String direction) {
+        return this.direction.equals(direction);
+    }
 
-    private int getNewCalculatedLongitude() {
+
+    private int getNewLongitudeAfterCrossingPole() {
         if (longitude >= 1 && longitude <= gridSize / 2) {
             return longitude + gridSize / 2;
         }
@@ -94,10 +228,7 @@ public class Rover {
         return longitude;
     }
 
-
     private boolean areCoordinatesNotValid() {
         return this.longitude == 0 || this.altitude == 0;
     }
-
-
 }
