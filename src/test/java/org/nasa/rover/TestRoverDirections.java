@@ -60,9 +60,13 @@ public class TestRoverDirections {
                                                      String expectedNewPosition){
 
 
-        String[] positionArray = inputPosition.split(",");
+        String[] inputArray = inputPosition.split(",");
+        String[] coordinatesArray = new String[]{inputArray[0],
+                inputArray[1]};
 
-        rover = new Rover(positionArray);
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(coordinatesArray, direction);
 
         rover.setGridSize(gridSize);
         rover.executeCommand(command);
@@ -96,9 +100,13 @@ public class TestRoverDirections {
                                                      String expectedNewPosition){
 
 
-        String[] positionArray = inputPosition.split(",");
+        String[] inputArray = inputPosition.split(",");
+        String[] coordinatesArray = new String[]{inputArray[0],
+                inputArray[1]};
 
-        rover = new Rover(positionArray);
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(coordinatesArray, direction);
 
         rover.setGridSize(gridSize);
         rover.executeCommand(command);
@@ -118,9 +126,13 @@ public class TestRoverDirections {
                                      String command,
                                      String expectedNewPosition){
 
-        String[] positionArray = inputPosition.split(",");
+        String[] inputArray = inputPosition.split(",");
+        String[] coordinatesArray = new String[]{inputArray[0],
+                inputArray[1]};
 
-        rover = new Rover(positionArray);
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(coordinatesArray, direction);
 
         rover.setGridSize(gridSize);
         rover.executeCommand(command);
@@ -133,12 +145,21 @@ public class TestRoverDirections {
     @Test
     void whenZeroZeroCoordinatesThenThrowUnsupportedOperationException(){
 
-        rover = new Rover(new String[]{"0", "0", "N"});
+        rover = new Rover(new String[]{"0", "0"}, Direction.NORTH);
         UnsupportedOperationException thrown = Assertions.assertThrows(UnsupportedOperationException.class, () ->
                 rover.executeCommand("f"));
 
         Assertions.assertEquals("Unable to move the rover from 0,0 coordinates " +
                 "because they are not defined", thrown.getMessage());
+    }
+
+
+    private Direction setDirection(String direction){
+        if(direction.equals("N")) return Direction.NORTH;
+        if(direction.equals("S")) return Direction.SOUTH;
+        if(direction.equals("W")) return Direction.WEST;
+        if(direction.equals("E")) return Direction.EAST;
+        throw new IllegalArgumentException("Direction is not identifiable");
     }
 
 }

@@ -3,7 +3,7 @@ package org.nasa.rover;
 public class Rover {
 
     private String actualNewPosition;
-    private String direction;
+    private Direction direction;
     private int longitude;
     private int altitude;
     private int gridSize;
@@ -16,10 +16,10 @@ public class Rover {
 
 
 
-    public Rover(String[] position) {
-        this.longitude = Integer.parseInt(position[0]);
-        this.altitude = Integer.parseInt(position[1]);
-        this.direction = position[2];
+    public Rover(String[] coordinates, Direction direction) {
+        this.longitude = Integer.parseInt(coordinates[0]);
+        this.altitude = Integer.parseInt(coordinates[1]);
+        this.direction = direction;
     }
 
     public void executeCommand(String command) {
@@ -59,7 +59,7 @@ public class Rover {
 
 
     private String wrapPosition() {
-        return String.format("%s,%s,%s", longitude, altitude, direction);
+        return String.format("%s,%s,%s", longitude, altitude, direction.value());
     }
 
 
@@ -70,24 +70,16 @@ public class Rover {
     }
 
 
-    enum Direction {
-        NORTH,
-        SOUTH,
-        EAST,
-        WEST
-    }
-
-
     private void setNewPositionAfterStepCommand(Character stepCommand) {
-        if (isDirection("N")) {
-            if (stepCommand == 'l') {
-                this.direction = "W";
-                return;
-            }
-            if (stepCommand == 'r') {
-                this.direction = "E";
-                return;
-            }
+        if(stepCommand == 'l'){
+            this.direction = this.direction.toTheLeft();
+            return;
+        }
+        if (stepCommand == 'r') {
+            this.direction = this.direction.toTheRight();
+            return;
+        }
+        if (isDirection(Direction.NORTH)) {
             if (stepCommand == 'f') {
                 goUp();
                 return;
@@ -98,15 +90,7 @@ public class Rover {
             }
             return;
         }
-        if (isDirection("S")) {
-            if (stepCommand == 'l') {
-                this.direction = "E";
-                return;
-            }
-            if (stepCommand == 'r') {
-                this.direction = "W";
-                return;
-            }
+        if (isDirection(Direction.SOUTH)) {
             if (stepCommand == 'f') {
                 goDown();
                 return;
@@ -117,15 +101,7 @@ public class Rover {
             }
             return;
         }
-        if (isDirection("W")) {
-            if (stepCommand == 'l') {
-                this.direction = "S";
-                return;
-            }
-            if (stepCommand == 'r') {
-                this.direction = "N";
-                return;
-            }
+        if (isDirection(Direction.WEST)) {
             if (stepCommand == 'b') {
                 longitude++;
                 longitude %= gridSize;
@@ -139,15 +115,7 @@ public class Rover {
             }
             return;
         }
-        if (isDirection("E")) {
-            if (stepCommand == 'l') {
-                this.direction = "N";
-                return;
-            }
-            if (stepCommand == 'r') {
-                this.direction = "S";
-                return;
-            }
+        if (isDirection(Direction.EAST)) {
             if (stepCommand == 'f') {
                 longitude++;
                 longitude %= gridSize;
@@ -206,14 +174,14 @@ public class Rover {
     }
 
 
-    private String getNewDirectionAfterCrossingPole() {
-        if (isDirection("N")) {
-            return "S";
+    private Direction getNewDirectionAfterCrossingPole() {
+        if (isDirection(Direction.NORTH)) {
+            return Direction.SOUTH;
         }
-        return "N";
+        return Direction.NORTH;
     }
 
-    private boolean isDirection(String direction) {
+    private boolean isDirection(Direction direction) {
         return this.direction.equals(direction);
     }
 
