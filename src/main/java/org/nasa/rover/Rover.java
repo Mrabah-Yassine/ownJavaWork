@@ -4,29 +4,29 @@ public class Rover {
 
     private String actualNewPosition;
     private Direction direction;
-    private int longitude;
-    private int altitude;
-    private int gridSize;
     private String command;
     private static int numberOfStepsSentByCommand;
-    private static final int NORTH_POLE_DEAD_POINT = 0;
-    private static int SOUTH_POLE_DEAD_POINT;
+
     private static final int LONGITUDE_DEAD_VALUE = 0;
     private int numberOfTimesPoleIsCrossed = 0;
 
+    private final Coordinates coordinates;
+
+    private final IPlanet iPlanet;
+
+    private final Grid grid;
 
 
-    public Rover(String[] coordinates, Direction direction) {
-        this.longitude = Integer.parseInt(coordinates[0]);
-        this.altitude = Integer.parseInt(coordinates[1]);
+
+    public Rover(IPlanet iPlanet, Coordinates coordinates, Direction direction,
+                 Grid grid) {
+        this.iPlanet = iPlanet;
+        this.coordinates = coordinates;
         this.direction = direction;
+        this.grid = grid;
     }
 
     public void executeCommand(String command) {
-        if (areCoordinatesNotValid()) {
-            throw new UnsupportedOperationException("Unable to move the rover from 0,0 coordinates " +
-                    "because they are not defined");
-        }
         this.command = command;
         numberOfStepsSentByCommand = getNumberOfCommandsSent();
         actualNewPosition = calculateAndGetNewPosition();
@@ -36,10 +36,6 @@ public class Rover {
         return actualNewPosition;
     }
 
-    public void setGridSize(int gridSize) {
-        this.gridSize = gridSize;
-        SOUTH_POLE_DEAD_POINT = gridSize;
-    }
 
     private int getNumberOfCommandsSent() {
         return this.command.length();
@@ -59,7 +55,7 @@ public class Rover {
 
 
     private String wrapPosition() {
-        return String.format("%s,%s,%s", longitude, altitude, direction.value());
+        return String.format("%s,%s,%s", coordinates.LONGITUDE, coordinates.ALTITUDE, direction.value());
     }
 
 
@@ -79,7 +75,7 @@ public class Rover {
             this.direction = this.direction.toTheRight();
             return;
         }
-        if (isDirection(Direction.NORTH)) {
+        if (this.direction.isEqualTo(Direction.NORTH)) {
             if (stepCommand == 'f') {
                 goUp();
                 return;
@@ -90,7 +86,7 @@ public class Rover {
             }
             return;
         }
-        if (isDirection(Direction.SOUTH)) {
+        if (this.direction.isEqualTo(Direction.SOUTH)) {
             if (stepCommand == 'f') {
                 goDown();
                 return;
@@ -101,30 +97,30 @@ public class Rover {
             }
             return;
         }
-        if (isDirection(Direction.WEST)) {
+        if (this.direction.isEqualTo(Direction.WEST)) {
             if (stepCommand == 'b') {
-                longitude++;
-                longitude %= gridSize;
+                coordinates.LONGITUDE++;
+                coordinates.LONGITUDE %= grid.size;
                 return;
             }
             if (stepCommand == 'f') {
-                longitude--;
+                coordinates.LONGITUDE--;
                 if(isLongitudeDeadValueCrossed()){
-                    longitude = getNewLongitudeAfterCrossingDeadValue();
+                    coordinates.LONGITUDE = getNewLongitudeAfterCrossingDeadValue();
                 }
             }
             return;
         }
-        if (isDirection(Direction.EAST)) {
+        if (this.direction.isEqualTo(Direction.EAST)) {
             if (stepCommand == 'f') {
-                longitude++;
-                longitude %= gridSize;
+                coordinates.LONGITUDE++;
+                coordinates.LONGITUDE %= grid.size;
                 return;
             }
             if (stepCommand == 'b') {
-                longitude--;
+                coordinates.LONGITUDE--;
                 if(isLongitudeDeadValueCrossed()){
-                    longitude = getNewLongitudeAfterCrossingDeadValue();
+                    coordinates.LONGITUDE = getNewLongitudeAfterCrossingDeadValue();
                 }
             }
         }
@@ -132,20 +128,20 @@ public class Rover {
 
 
     private boolean isLongitudeDeadValueCrossed(){
-        return longitude >= LONGITUDE_DEAD_VALUE;
+        return coordinates.LONGITUDE <= LONGITUDE_DEAD_VALUE;
     }
 
     private int getNewLongitudeAfterCrossingDeadValue(){
-        return gridSize - (longitude % gridSize);
+        return grid.size - (coordinates.LONGITUDE % grid.size);
     }
 
     /**
      * Moving the rover towards the South Pole of the planet
      */
     private void goDown() {
-        altitude++;
-        if (isPoleCrossed()) {
-            altitude--;
+        coordinates.ALTITUDE++;
+        if (iPlanet.isPoleCrossed(coordinates)) {
+            coordinates.ALTITUDE--;
             numberOfTimesPoleIsCrossed++;
             changeLongitudeAndDirection();
         }
@@ -155,48 +151,37 @@ public class Rover {
      * Moving the rover towards the North Pole of the planet
      */
     private void goUp() {
-        altitude--;
-        if (isPoleCrossed()) {
-            altitude++;
+        coordinates.ALTITUDE--;
+        if (iPlanet.isPoleCrossed(coordinates)) {
+            coordinates.ALTITUDE++;
             numberOfTimesPoleIsCrossed++;
             changeLongitudeAndDirection();
         }
     }
 
-    private boolean isPoleCrossed(){
-        return altitude > SOUTH_POLE_DEAD_POINT || altitude <= NORTH_POLE_DEAD_POINT;
-    }
-
 
     private void changeLongitudeAndDirection() {
-        longitude = getNewLongitudeAfterCrossingPole();
+        coordinates.LONGITUDE = getNewLongitudeAfterCrossingPole();
         direction = getNewDirectionAfterCrossingPole();
     }
 
 
     private Direction getNewDirectionAfterCrossingPole() {
-        if (isDirection(Direction.NORTH)) {
+        if (this.direction.isEqualTo(Direction.NORTH)) {
             return Direction.SOUTH;
         }
         return Direction.NORTH;
     }
 
-    private boolean isDirection(Direction direction) {
-        return this.direction.equals(direction);
-    }
-
 
     private int getNewLongitudeAfterCrossingPole() {
-        if (longitude >= 1 && longitude <= gridSize / 2) {
-            return longitude + gridSize / 2;
+        if (coordinates.LONGITUDE >= 1 && coordinates.LONGITUDE <= grid.size / 2) {
+            return coordinates.LONGITUDE + grid.size / 2;
         }
-        if (longitude > gridSize / 2 && longitude <= gridSize) {
-            return longitude - gridSize / 2;
+        if (coordinates.LONGITUDE > grid.size / 2 && coordinates.LONGITUDE <= grid.size) {
+            return coordinates.LONGITUDE - grid.size / 2;
         }
-        return longitude;
+        return coordinates.LONGITUDE;
     }
 
-    private boolean areCoordinatesNotValid() {
-        return this.longitude == 0 || this.altitude == 0;
-    }
 }

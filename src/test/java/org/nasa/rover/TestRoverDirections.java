@@ -12,6 +12,11 @@ public class TestRoverDirections {
 
     private final int gridSize = 8;
 
+    private final Grid grid = new Grid(gridSize);
+
+    private final IPlanet iPlanet = new MarsPlanet(grid);
+
+
 
     @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
     @CsvSource({
@@ -55,20 +60,19 @@ public class TestRoverDirections {
 
 
     })
-    void givenInitialDirectionIsNorthThenMoveForward(String inputPosition,
+    void givenInitialDirectionIsNorthThenMoveForwardOnly(String inputPosition,
                                                      String command,
                                                      String expectedNewPosition){
 
 
         String[] inputArray = inputPosition.split(",");
-        String[] coordinatesArray = new String[]{inputArray[0],
-                inputArray[1]};
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
 
         Direction direction = setDirection(inputArray[2]);
 
-        rover = new Rover(coordinatesArray, direction);
+        rover = new Rover(iPlanet, coordinates, direction, grid);
 
-        rover.setGridSize(gridSize);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -95,20 +99,92 @@ public class TestRoverDirections {
 
 
     })
-    void givenInitialDirectionIsSouthThenMoveForward(String inputPosition,
+    void givenInitialDirectionIsSouthThenMoveForwardOnly(String inputPosition,
                                                      String command,
                                                      String expectedNewPosition){
 
 
         String[] inputArray = inputPosition.split(",");
-        String[] coordinatesArray = new String[]{inputArray[0],
-                inputArray[1]};
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
 
         Direction direction = setDirection(inputArray[2]);
 
-        rover = new Rover(coordinatesArray, direction);
+        rover = new Rover(iPlanet, coordinates, direction, grid);
+        rover.executeCommand(command);
+        //assertions,
+        Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
+    }
 
-        rover.setGridSize(gridSize);
+
+
+    @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
+    @CsvSource({
+            "'1,8,S', '', '1,8,S'",
+            "'1,8,S', 'b', '1,7,S'",
+            "'1,8,S', 'bb', '1,6,S'",
+            "'1,8,S', 'bbb', '1,5,S'",
+            "'1,1,S', 'bbb', '5,3,N'",
+            "'5,5,S', 'bbbbbbbb', '1,4,N'",
+            "'8,8,S', 'bbbbbbbb', '4,1,N'",
+            "'7,6,S', 'bbbbbbbb', '3,3,N'",
+            "'7,6,S', 'bbbbbbbbbbbbbbbb', '7,6,S'",
+            "'7,6,S', 'bbbbbbbbbbbbbbb', '7,7,S'",
+            "'7,3,S', 'bbbbbbbbbbbbb', '7,6,S'",
+            "'7,3,S', 'bbbbbbbbbbbbbbb', '7,4,S'",
+            "'7,7,S', 'bbbbbbbbbbbbbbbbb', '7,6,S'",
+            "'4,8,S', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb', '8,6,N'",
+
+
+    })
+    void givenInitialDirectionIsSouthThenMoveBackwardOnly(String inputPosition,
+                                                         String command,
+                                                         String expectedNewPosition){
+
+
+        String[] inputArray = inputPosition.split(",");
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
+
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(iPlanet, coordinates, direction, grid);
+        rover.executeCommand(command);
+        //assertions,
+        Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
+    }
+
+
+    @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
+    @CsvSource({
+            "'1,8,N', 'b', '5,8,S'",
+            "'1,8,N', 'bb', '5,7,S'",
+            "'1,8,N', 'bbb', '5,6,S'",
+            "'1,1,N', 'bbb', '1,4,N'",
+            "'5,5,N', 'bbbbbbbb', '1,4,S'",
+            "'8,8,N', 'bbbbbbbb', '4,1,S'",
+            "'7,6,N', 'bbbbbbbb', '3,3,S'",
+            "'7,6,N', 'bbbbbbbbbbbbbbbb', '7,6,N'",
+            "'7,6,N', 'bbbbbbbbbbbbbbb', '7,5,N'",
+            "'7,3,N', 'bbbbbbbbbbbbb', '3,1,S'",
+            "'7,3,N', 'bbbbbbbbbbbbbbb', '7,2,N'",
+            "'7,7,N', 'bbbbbbbbbbbbbbbbb', '7,8,N'",
+            "'4,8,N', 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbb', '4,5,N'",
+
+
+    })
+    void givenInitialDirectionIsNorthThenMoveBackwardOnly(String inputPosition,
+                                                          String command,
+                                                          String expectedNewPosition){
+
+
+        String[] inputArray = inputPosition.split(",");
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
+
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(iPlanet, coordinates, direction, grid);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -119,22 +195,57 @@ public class TestRoverDirections {
     @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
     @CsvSource({
             "'1,8,S', 'r', '1,8,W'",
+            "'1,8,S', 'l', '1,8,E'",
+            "'1,8,S', 'rr', '1,8,N'",
+            "'1,8,S', 'rrr', '1,8,E'",
+            "'1,8,S', 'rrrr', '1,8,S'",
+            "'1,8,S', 'lll', '1,8,W'",
+            "'8,8,N', 'lll', '8,8,E'",
 
 
     })
-    void givenInitialDirectionRotate(String inputPosition,
+    void givenInitialDirectionRotateOnly(String inputPosition,
                                      String command,
                                      String expectedNewPosition){
+
+        String[] inputArray = inputPosition.split(",");
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
+
+        Direction direction = setDirection(inputArray[2]);
+
+        rover = new Rover(iPlanet, coordinates, direction, grid);
+        rover.executeCommand(command);
+        //assertions,
+        Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
+    }
+
+
+    @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
+    @CsvSource({
+            "'1,8,S', 'frllbbfrb', '2,8,S'",
+            "'8,8,W', 'bbb', '3,8,W'",
+            "'1,8,W', 'ff', '7,8,W'",
+            "'1,8,E', 'bbb', '6,8,E'",
+            "'8,8,E', 'ffff', '4,8,E'",
+            "'8,8,S', 'flffllbbrfrf', '5,8,E'",
+
+
+    })
+    void givenInitialDirectionRotateAndMove(String inputPosition,
+                                         String command,
+                                         String expectedNewPosition){
 
         String[] inputArray = inputPosition.split(",");
         String[] coordinatesArray = new String[]{inputArray[0],
                 inputArray[1]};
 
+        Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
+                Integer.parseInt(inputArray[1]));
+
         Direction direction = setDirection(inputArray[2]);
 
-        rover = new Rover(coordinatesArray, direction);
-
-        rover.setGridSize(gridSize);
+        rover = new Rover(iPlanet, coordinates, direction, grid);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -145,12 +256,12 @@ public class TestRoverDirections {
     @Test
     void whenZeroZeroCoordinatesThenThrowUnsupportedOperationException(){
 
-        rover = new Rover(new String[]{"0", "0"}, Direction.NORTH);
-        UnsupportedOperationException thrown = Assertions.assertThrows(UnsupportedOperationException.class, () ->
-                rover.executeCommand("f"));
 
-        Assertions.assertEquals("Unable to move the rover from 0,0 coordinates " +
-                "because they are not defined", thrown.getMessage());
+        IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () ->
+                new Coordinates(0, 0));
+
+        Assertions.assertEquals("0,0 coordinates " +
+                "are not valid", thrown.getMessage());
     }
 
 
