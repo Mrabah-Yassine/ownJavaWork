@@ -39,6 +39,7 @@ public enum Direction {
         return this.equals(direction);
     }
 
+
     private void setRelativeDirections() {
         switch (this.directionValue) {
             case "N" -> {

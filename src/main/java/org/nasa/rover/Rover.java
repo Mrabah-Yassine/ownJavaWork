@@ -128,7 +128,7 @@ public class Rover {
 
 
     private boolean isLongitudeDeadValueCrossed(){
-        return coordinates.LONGITUDE <= LONGITUDE_DEAD_VALUE;
+        return coordinates.LONGITUDE <= grid.minLimit;
     }
 
     private int getNewLongitudeAfterCrossingDeadValue(){
@@ -140,7 +140,7 @@ public class Rover {
      */
     private void goDown() {
         coordinates.ALTITUDE++;
-        if (iPlanet.isPoleCrossed(coordinates)) {
+        if (didItCrossPole(coordinates)) {
             coordinates.ALTITUDE--;
             numberOfTimesPoleIsCrossed++;
             changeLongitudeAndDirection();
@@ -152,12 +152,18 @@ public class Rover {
      */
     private void goUp() {
         coordinates.ALTITUDE--;
-        if (iPlanet.isPoleCrossed(coordinates)) {
+        if (didItCrossPole(coordinates)) {
             coordinates.ALTITUDE++;
             numberOfTimesPoleIsCrossed++;
             changeLongitudeAndDirection();
         }
     }
+
+
+    private boolean didItCrossPole(Coordinates coordinates) {
+        return coordinates.ALTITUDE > grid.maxLimit || coordinates.ALTITUDE <= grid.minLimit;
+    }
+
 
 
     private void changeLongitudeAndDirection() {
