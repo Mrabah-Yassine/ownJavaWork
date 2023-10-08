@@ -8,14 +8,13 @@ public class Rover {
     private static int numberOfStepsSentByCommand;
 
     private static final int LONGITUDE_DEAD_VALUE = 0;
-    private int numberOfTimesPoleIsCrossed = 0;
+    public int howManyTimesDidItCrossPole = 0;
 
     private final Coordinates coordinates;
 
     private final IPlanet iPlanet;
 
     private final Grid grid;
-
 
 
     public Rover(IPlanet iPlanet, Coordinates coordinates, Direction direction,
@@ -29,7 +28,7 @@ public class Rover {
     public void executeCommand(String command) {
         this.command = command;
         numberOfStepsSentByCommand = getNumberOfCommandsSent();
-        actualNewPosition = calculateAndGetNewPosition();
+        actualNewPosition = getUpdatedPosition();
     }
 
     public String getNewActualPosition() {
@@ -41,9 +40,9 @@ public class Rover {
         return this.command.length();
     }
 
-    private String calculateAndGetNewPosition() {
+    private String getUpdatedPosition() {
         if (isThereAnyCommandSent()) {
-            setNewPositionAfterCommandExecution();
+            updatePositionAfterFullCommandExecution();
         }
         return wrapPosition();
     }
@@ -55,139 +54,121 @@ public class Rover {
 
 
     private String wrapPosition() {
-        return String.format("%s,%s,%s", coordinates.LONGITUDE, coordinates.ALTITUDE, direction.value());
+        return coordinates.value().append(direction.value()).toString();
     }
 
 
-    private void setNewPositionAfterCommandExecution() {
+    private void updatePositionAfterFullCommandExecution() {
         for (Character commandStep : this.command.toCharArray()) {
-            setNewPositionAfterStepCommand(commandStep);
+            updatePositionAfterExecutionOf(commandStep);
         }
     }
 
 
-    private void setNewPositionAfterStepCommand(Character stepCommand) {
-        if(stepCommand == 'l'){
-            this.direction = this.direction.toTheLeft();
+    private void updatePositionAfterExecutionOf(Character stepCommand) {
+
+        Pole thisPole = Pole.NORTH;
+        thisPole = thisPole.selectPoleFromDirection(this.direction);
+
+        if (isItRotationCommand(stepCommand)) {
+            rotateToThe(stepCommand);
             return;
         }
-        if (stepCommand == 'r') {
-            this.direction = this.direction.toTheRight();
+        if (isRoverInVerticalMode()) {
+            moveVerticallyWithCommandTowards(stepCommand, thisPole);
             return;
         }
-        if (this.direction.isEqualTo(Direction.NORTH)) {
-            if (stepCommand == 'f') {
-                goUp();
-                return;
-            }
-            if (stepCommand == 'b') {
-                goDown();
-                return;
-            }
-            return;
-        }
-        if (this.direction.isEqualTo(Direction.SOUTH)) {
-            if (stepCommand == 'f') {
-                goDown();
-                return;
-            }
-            if (stepCommand == 'b') {
-                goUp();
-                return;
-            }
-            return;
+
+        if(isRoverInHorizontalMode()){
+
         }
         if (this.direction.isEqualTo(Direction.WEST)) {
             if (stepCommand == 'b') {
-                coordinates.LONGITUDE++;
-                coordinates.LONGITUDE %= grid.size;
+                coordinates.incrementLongitudeInside(grid);
                 return;
             }
             if (stepCommand == 'f') {
-                coordinates.LONGITUDE--;
-                if(isLongitudeDeadValueCrossed()){
-                    coordinates.LONGITUDE = getNewLongitudeAfterCrossingDeadValue();
+                coordinates.decrementLongitude();
+                if (didTheRoverCrossLongitudeLimitLine()) {
+                    coordinates.updateLongitudeOverHorizontalLimitsOf(grid);
                 }
             }
             return;
         }
         if (this.direction.isEqualTo(Direction.EAST)) {
             if (stepCommand == 'f') {
-                coordinates.LONGITUDE++;
-                coordinates.LONGITUDE %= grid.size;
+                coordinates.incrementLongitudeInside(grid);
                 return;
             }
             if (stepCommand == 'b') {
-                coordinates.LONGITUDE--;
-                if(isLongitudeDeadValueCrossed()){
-                    coordinates.LONGITUDE = getNewLongitudeAfterCrossingDeadValue();
+                coordinates.decrementLongitude();
+                if (didTheRoverCrossLongitudeLimitLine()) {
+                    coordinates.updateLongitudeOverHorizontalLimitsOf(grid);
                 }
             }
         }
     }
 
-
-    private boolean isLongitudeDeadValueCrossed(){
-        return coordinates.LONGITUDE <= grid.minLimit;
+    private boolean isItRotationCommand(Character stepCommand) {
+        return stepCommand == 'r' || stepCommand == 'l';
     }
 
-    private int getNewLongitudeAfterCrossingDeadValue(){
-        return grid.size - (coordinates.LONGITUDE % grid.size);
+
+    private boolean isRoverInVerticalMode() {
+        return this.direction == Direction.NORTH || this.direction == Direction.SOUTH;
     }
 
-    /**
-     * Moving the rover towards the South Pole of the planet
-     */
-    private void goDown() {
-        coordinates.ALTITUDE++;
-        if (didItCrossPole(coordinates)) {
-            coordinates.ALTITUDE--;
-            numberOfTimesPoleIsCrossed++;
-            changeLongitudeAndDirection();
+    private boolean isRoverInHorizontalMode(){
+        return this.direction == Direction.WEST || this.direction == Direction.EAST;
+    }
+
+
+    private void moveVerticallyWithCommandTowards(Character stepCommand, Pole pole) {
+        if (stepCommand == 'b') {
+            pole = pole.toTheOpposite();
+        }
+        moveOneStepCloserTo(pole);
+    }
+
+
+    private void rotateToThe(Character stepCommand) {
+        if (stepCommand == 'l') {
+            this.direction = this.direction.toTheLeft();
+            return;
+        }
+        if (stepCommand == 'r') {
+            this.direction = this.direction.toTheRight();
         }
     }
 
-    /**
-     * Moving the rover towards the North Pole of the planet
-     */
-    private void goUp() {
-        coordinates.ALTITUDE--;
-        if (didItCrossPole(coordinates)) {
-            coordinates.ALTITUDE++;
-            numberOfTimesPoleIsCrossed++;
-            changeLongitudeAndDirection();
+
+    private void moveOneStepCloserTo(Pole pole) {
+        if (pole == Pole.NORTH) {
+            coordinates.decrementAltitude();
+        } else {
+            coordinates.incrementAltitude();
+        }
+        if (didTheRoverCrossPole()) {
+            pole = pole.toTheOpposite();
+            moveOneStepCloserTo(pole);
+            howManyTimesDidItCrossPole++;
+            updateLongitudeAndDirection();
         }
     }
 
 
-    private boolean didItCrossPole(Coordinates coordinates) {
-        return coordinates.ALTITUDE > grid.maxLimit || coordinates.ALTITUDE <= grid.minLimit;
+    private void updateLongitudeAndDirection() {
+        coordinates.updateLongitudeOverVerticalLimitsOf(grid);
+        direction = direction.toTheOpposite();
     }
 
 
-
-    private void changeLongitudeAndDirection() {
-        coordinates.LONGITUDE = getNewLongitudeAfterCrossingPole();
-        direction = getNewDirectionAfterCrossingPole();
+    private boolean didTheRoverCrossPole() {
+        return coordinates.doAltitudeViolateVerticalLimitsOf(grid);
     }
 
-
-    private Direction getNewDirectionAfterCrossingPole() {
-        if (this.direction.isEqualTo(Direction.NORTH)) {
-            return Direction.SOUTH;
-        }
-        return Direction.NORTH;
-    }
-
-
-    private int getNewLongitudeAfterCrossingPole() {
-        if (coordinates.LONGITUDE >= 1 && coordinates.LONGITUDE <= grid.size / 2) {
-            return coordinates.LONGITUDE + grid.size / 2;
-        }
-        if (coordinates.LONGITUDE > grid.size / 2 && coordinates.LONGITUDE <= grid.size) {
-            return coordinates.LONGITUDE - grid.size / 2;
-        }
-        return coordinates.LONGITUDE;
+    private boolean didTheRoverCrossLongitudeLimitLine() {
+        return coordinates.doLongitudeViolateHorizontalLimitsOf(grid);
     }
 
 }

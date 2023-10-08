@@ -8,9 +8,9 @@ public enum Direction {
     WEST("W");
 
     private final String directionValue;
-    private Direction actualDirection;
     private Direction rightDirection;
     private Direction leftDirection;
+    private Direction oppositeDirection;
 
     Direction(String actualDirection) {
         this.directionValue = actualDirection;
@@ -27,9 +27,11 @@ public enum Direction {
         return leftDirection;
     }
 
-    public Direction getActualDirection(){
-        return actualDirection;
+    public Direction toTheOpposite(){
+        setRelativeDirections();
+        return oppositeDirection;
     }
+
 
     public String value(){
         return directionValue;
@@ -43,26 +45,28 @@ public enum Direction {
     private void setRelativeDirections() {
         switch (this.directionValue) {
             case "N" -> {
-                actualDirection = Direction.NORTH;
                 rightDirection = Direction.EAST;
                 leftDirection = Direction.WEST;
+                oppositeDirection = Direction.SOUTH;
             }
             case "S" -> {
-                actualDirection = Direction.SOUTH;
                 rightDirection = Direction.WEST;
                 leftDirection = Direction.EAST;
+                oppositeDirection = Direction.NORTH;
+
             }
             case "W" -> {
-                actualDirection = Direction.WEST;
                 rightDirection = Direction.NORTH;
                 leftDirection = Direction.SOUTH;
+                oppositeDirection = Direction.EAST;
+
             }
             case "E" -> {
-                actualDirection = Direction.EAST;
                 rightDirection = Direction.SOUTH;
                 leftDirection = Direction.NORTH;
+                oppositeDirection = Direction.WEST;
+
             }
-            default -> throw new IllegalArgumentException("This type of direction is not supported");
         }
     }
 }
