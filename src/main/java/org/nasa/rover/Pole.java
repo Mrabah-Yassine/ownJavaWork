@@ -9,9 +9,9 @@ public enum Pole {
         return Pole.NORTH;
     }
 
-    public Pole selectPoleFromDirection(Direction direction) {
+    public Pole selectPoleFromDirection(Orientation orientation) {
         for (Pole pole : Pole.values()) {
-            if (pole.name().equals(direction.name())) {
+            if (pole.name().equals(orientation.name())) {
                 return pole;
             }
         }

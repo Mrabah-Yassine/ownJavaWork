@@ -4,10 +4,10 @@ public class Position {
 
     public Coordinates coordinates;
 
-    public Direction direction;
+    public Orientation orientation;
 
-    public Position(Coordinates coordinates, Direction direction) {
+    public Position(Coordinates coordinates, Orientation orientation) {
         this.coordinates = coordinates;
-        this.direction = direction;
+        this.orientation = orientation;
     }
 }

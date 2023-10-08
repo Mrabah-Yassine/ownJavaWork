@@ -4,6 +4,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.nasa.rover.command.impl.MoveBackward;
+import org.nasa.rover.command.impl.MoveForward;
+import org.nasa.rover.command.impl.RotateLeft;
+import org.nasa.rover.command.impl.RotateRight;
+import org.nasa.rover.command.itf.ICommand;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 public class TestRoverDirections {
@@ -14,7 +22,6 @@ public class TestRoverDirections {
 
     private final Grid grid = new Grid(gridSize);
 
-    private final IPlanet iPlanet = new MarsPlanet(grid);
 
 
 
@@ -69,9 +76,10 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command, orientation);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        rover = new Rover(coordinates, orientation, grid, commandsList);
 
         rover.executeCommand(command);
         //assertions,
@@ -108,9 +116,11 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command);
+
+        rover = new Rover(coordinates, orientation, grid, commandsList);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -146,9 +156,11 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command);
+
+        rover = new Rover(coordinates, orientation, grid, commandsList);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -182,9 +194,11 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command);
+
+        rover = new Rover(coordinates, orientation, grid, commandsList);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -212,9 +226,11 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command);
+
+        rover = new Rover(coordinates, orientation, grid, commandsList);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -243,9 +259,11 @@ public class TestRoverDirections {
         Coordinates coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
                 Integer.parseInt(inputArray[1]));
 
-        Direction direction = setDirection(inputArray[2]);
+        Orientation orientation = setOrientation(inputArray[2]);
 
-        rover = new Rover(iPlanet, coordinates, direction, grid);
+        List<ICommand> commandsList = setCommandsListWithOrientation(command);
+
+        rover = new Rover(coordinates, orientation, grid, commandsList);
         rover.executeCommand(command);
         //assertions,
         Assertions.assertEquals(expectedNewPosition, rover.getNewActualPosition());
@@ -265,12 +283,27 @@ public class TestRoverDirections {
     }
 
 
-    private Direction setDirection(String direction){
-        if(direction.equals("N")) return Direction.NORTH;
-        if(direction.equals("S")) return Direction.SOUTH;
-        if(direction.equals("W")) return Direction.WEST;
-        if(direction.equals("E")) return Direction.EAST;
+    private Orientation setOrientation(String orientation){
+        if(orientation.equals("N")) return Orientation.NORTH;
+        if(orientation.equals("S")) return Orientation.SOUTH;
+        if(orientation.equals("W")) return Orientation.WEST;
+        if(orientation.equals("E")) return Orientation.EAST;
         throw new IllegalArgumentException("Direction is not identifiable");
+    }
+
+
+    private List<ICommand> setCommandsListWithOrientation(String command,
+                                                          Orientation orientation){
+        List<ICommand> commandsList = new LinkedList<>();
+        for (Character stepCommand : command.toCharArray()){
+            switch (stepCommand) {
+                case ('l') -> commandsList.add(new RotateLeft(orientation));
+                case ('r') -> commandsList.add(new RotateRight(orientation));
+                case ('f') -> commandsList.add(new MoveForward(orientation));
+                case ('b') -> commandsList.add(new MoveBackward(orientation));
+            }
+        }
+        return commandsList;
     }
 
 }
