@@ -111,11 +111,11 @@ public class MarsRover implements IPlanetRover {
 
 
     private boolean isRoverOrientedToThe(Orientation orientationToCheck){
-        return this.position.orientation == orientationToCheck;
+        return this.position.orientation.isEqualTo(orientationToCheck);
     }
 
     private boolean isRoverInVerticalMode() {
-        return this.position.orientation == Orientation.NORTH || this.position.orientation == Orientation.SOUTH;
+        return this.position.orientation.isEqualTo(Orientation.NORTH) || this.position.orientation.isEqualTo(Orientation.SOUTH);
     }
 
 
