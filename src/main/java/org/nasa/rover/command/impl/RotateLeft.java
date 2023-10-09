@@ -1,18 +1,18 @@
 package org.nasa.rover.command.impl;
 
-import org.nasa.rover.Orientation;
-import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.command.itf.IRoverCommand;
+import org.nasa.rover.rover.IPlanetRover;
 
-public class RotateLeft implements ICommand {
+public class RotateLeft implements IRoverCommand {
 
-    private Orientation orientation;
+    private final IPlanetRover rover;
 
-    public RotateLeft(Orientation orientation) {
-        this.orientation = orientation;
+    public RotateLeft(IPlanetRover rover) {
+        this.rover = rover;
     }
 
     @Override
     public void execute() {
-        this.orientation = this.orientation.toTheLeft();
+        rover.rotateToLeft();
     }
 }

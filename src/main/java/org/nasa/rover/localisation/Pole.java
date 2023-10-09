@@ -1,4 +1,4 @@
-package org.nasa.rover;
+package org.nasa.rover.localisation;
 
 public enum Pole {
     SOUTH,
@@ -9,7 +9,7 @@ public enum Pole {
         return Pole.NORTH;
     }
 
-    public Pole selectPoleFromDirection(Orientation orientation) {
+    public Pole selectPoleFromOrientation(Orientation orientation) {
         for (Pole pole : Pole.values()) {
             if (pole.name().equals(orientation.name())) {
                 return pole;

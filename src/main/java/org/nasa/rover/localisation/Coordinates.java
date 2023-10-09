@@ -1,4 +1,4 @@
-package org.nasa.rover;
+package org.nasa.rover.localisation;
 
 public class Coordinates {
 
@@ -52,15 +52,6 @@ public class Coordinates {
         LONGITUDE = grid.maxLimit - (LONGITUDE % grid.maxLimit);
     }
 
-    private boolean isLongitudeInFirstHalfOf(Grid grid){
-        return LONGITUDE >= 1 && LONGITUDE <= grid.maxLimit / 2;
-    }
-
-    private boolean isLongitudeInLastHalfOf(Grid grid){
-        return LONGITUDE > grid.maxLimit / 2 && LONGITUDE <= grid.maxLimit;
-    }
-
-
     public void incrementAltitude() {
         ALTITUDE++;
     }
@@ -76,6 +67,14 @@ public class Coordinates {
 
     public void decrementLongitude() {
         LONGITUDE--;
+    }
+
+    private boolean isLongitudeInFirstHalfOf(Grid grid){
+        return LONGITUDE >= 1 && LONGITUDE <= grid.maxLimit / 2;
+    }
+
+    private boolean isLongitudeInLastHalfOf(Grid grid){
+        return LONGITUDE > grid.maxLimit / 2 && LONGITUDE <= grid.maxLimit;
     }
 
     private boolean areValid() {

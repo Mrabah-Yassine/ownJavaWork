@@ -1,4 +1,4 @@
-package org.nasa.rover;
+package org.nasa.rover.localisation;
 
 public class Position {
 
@@ -9,5 +9,10 @@ public class Position {
     public Position(Coordinates coordinates, Orientation orientation) {
         this.coordinates = coordinates;
         this.orientation = orientation;
+    }
+
+
+    public String value(){
+        return coordinates.value().append(orientation.value()).toString();
     }
 }

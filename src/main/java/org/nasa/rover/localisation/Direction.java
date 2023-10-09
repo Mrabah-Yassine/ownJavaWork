@@ -1,11 +1,9 @@
-package org.nasa.rover;
+package org.nasa.rover.localisation;
 
 public enum Direction {
 
     FORWARD,
-    BACKWARD,
-    LEFT,
-    RIGHT;
+    BACKWARD;
 
     public Direction reverse(){
         if(this == Direction.FORWARD) return Direction.BACKWARD;

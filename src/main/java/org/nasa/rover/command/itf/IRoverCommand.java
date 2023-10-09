@@ -1,6 +1,6 @@
 package org.nasa.rover.command.itf;
 
-public interface ICommand {
+public interface IRoverCommand {
 
     void execute();
 }
