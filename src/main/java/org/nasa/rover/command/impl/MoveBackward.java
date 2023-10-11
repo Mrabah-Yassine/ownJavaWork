@@ -5,14 +5,14 @@ import org.nasa.rover.rover.IPlanetRover;
 
 public class MoveBackward implements IRoverCommand {
 
-    private final IPlanetRover rover;
+    private final IPlanetRover iRover;
 
-    public MoveBackward(IPlanetRover rover) {
-        this.rover = rover;
+    public MoveBackward(IPlanetRover iRover) {
+        this.iRover = iRover;
     }
 
     @Override
     public void execute() {
-        rover.moveBackward();
+        iRover.moveBackward();
     }
 }

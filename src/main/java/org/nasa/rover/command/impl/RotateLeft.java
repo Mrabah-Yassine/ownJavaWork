@@ -5,14 +5,14 @@ import org.nasa.rover.rover.IPlanetRover;
 
 public class RotateLeft implements IRoverCommand {
 
-    private final IPlanetRover rover;
+    private final IPlanetRover iRover;
 
-    public RotateLeft(IPlanetRover rover) {
-        this.rover = rover;
+    public RotateLeft(IPlanetRover iRover) {
+        this.iRover = iRover;
     }
 
     @Override
     public void execute() {
-        rover.rotateToLeft();
+        iRover.rotateToLeft();
     }
 }

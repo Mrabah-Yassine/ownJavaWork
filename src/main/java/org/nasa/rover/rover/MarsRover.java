@@ -1,6 +1,5 @@
 package org.nasa.rover.rover;
 
-import org.nasa.rover.localisation.Grid;
 import org.nasa.rover.localisation.Orientation;
 import org.nasa.rover.localisation.Pole;
 import org.nasa.rover.localisation.Position;
@@ -9,17 +8,14 @@ public class MarsRover implements IPlanetRover {
 
     public int howManyTimesDidItCrossPole = 0;
 
-    private final Grid grid;
-
     private final Position position;
 
     private Pole pole = Pole.NORTH;
     ;
 
 
-    public MarsRover(Position position, Grid grid) {
+    public MarsRover(Position position) {
         this.position = position;
-        this.grid = grid;
     }
 
 
@@ -38,11 +34,11 @@ public class MarsRover implements IPlanetRover {
             return;
         }
         if (isRoverOrientedToThe(Orientation.WEST)) {
-            moveTowardsTheWest();
+            moveOneStepTowardsThe(Orientation.WEST);
             return;
         }
         if (isRoverOrientedToThe(Orientation.EAST)) {
-            moveTowardsTheEast();
+            moveOneStepTowardsThe(Orientation.EAST);
         }
     }
 
@@ -56,11 +52,11 @@ public class MarsRover implements IPlanetRover {
             return;
         }
         if (isRoverOrientedToThe(Orientation.WEST)) {
-            moveTowardsTheEast();
+            moveOneStepTowardsThe(Orientation.EAST);
             return;
         }
         if (isRoverOrientedToThe(Orientation.EAST)) {
-            moveTowardsTheWest();
+            moveOneStepTowardsThe(Orientation.WEST);
         }
     }
 
@@ -75,42 +71,25 @@ public class MarsRover implements IPlanetRover {
     }
 
 
-    private void moveTowardsTheWest(){
-        position.coordinates.decrementLongitude();
-        if (didTheRoverCrossLongitudeLimitLine()) {
-            position.coordinates.updateLongitudeOverHorizontalLimitsOf(grid);
-        }
-    }
-
-
-    private void moveTowardsTheEast(){
-        this.position.coordinates.incrementLongitudeInside(grid);
+    private void moveOneStepTowardsThe(Orientation orientation) {
+        position.coordinates.updateAfterMovingTo(orientation);
     }
 
 
     private void moveOneStepCloserTo(Pole pole) {
-        if (pole == Pole.NORTH) {
-            position.coordinates.decrementAltitude();
-        } else {
-            position.coordinates.incrementAltitude();
-        }
+        position.coordinates.updateVerticallyTowardsThe(pole);
         if (didTheRoverCrossPole()) {
             pole = pole.toTheOpposite();
             moveOneStepCloserTo(pole);
             howManyTimesDidItCrossPole++;
-            updateLongitudeAndDirectionAfterCrossingBoundaries();
+            position.coordinates.wrapLongitudeVertically();
+            position.orientation = position.orientation.toTheOpposite();
         }
     }
 
 
 
-    private void updateLongitudeAndDirectionAfterCrossingBoundaries() {
-        position.coordinates.updateLongitudeOverVerticalLimitsOf(grid);
-        position.orientation = position.orientation.toTheOpposite();
-    }
-
-
-    private boolean isRoverOrientedToThe(Orientation orientationToCheck){
+    private boolean isRoverOrientedToThe(Orientation orientationToCheck) {
         return this.position.orientation.isEqualTo(orientationToCheck);
     }
 
@@ -120,11 +99,7 @@ public class MarsRover implements IPlanetRover {
 
 
     private boolean didTheRoverCrossPole() {
-        return position.coordinates.doAltitudeViolateVerticalLimitsOf(grid);
-    }
-
-    private boolean didTheRoverCrossLongitudeLimitLine() {
-        return position.coordinates.doLongitudeViolateHorizontalLimitsOf(grid);
+        return position.coordinates.isLatitudeOutOfBounds();
     }
 
 }

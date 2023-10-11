@@ -5,14 +5,14 @@ import org.nasa.rover.rover.IPlanetRover;
 
 public class MoveForward implements IRoverCommand {
 
-    private final IPlanetRover rover;
+    private final IPlanetRover iRover;
 
-    public MoveForward(IPlanetRover rover) {
-        this.rover = rover;
+    public MoveForward(IPlanetRover iRover) {
+        this.iRover = iRover;
     }
 
     @Override
     public void execute() {
-        rover.moveForward();
+        iRover.moveForward();
     }
 }
