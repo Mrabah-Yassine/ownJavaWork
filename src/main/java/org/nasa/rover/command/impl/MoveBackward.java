@@ -1,9 +1,9 @@
 package org.nasa.rover.command.impl;
 
-import org.nasa.rover.command.itf.IRoverCommand;
+import org.nasa.rover.command.itf.ICommand;
 import org.nasa.rover.rover.IPlanetRover;
 
-public class MoveBackward implements IRoverCommand {
+public class MoveBackward implements ICommand {
 
     private final IPlanetRover iRover;
 

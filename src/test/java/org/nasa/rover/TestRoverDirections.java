@@ -5,14 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.nasa.rover.command.RoverNavigationInvoker;
-import org.nasa.rover.command.impl.MoveBackward;
-import org.nasa.rover.command.impl.MoveForward;
-import org.nasa.rover.command.impl.RotateLeft;
-import org.nasa.rover.command.impl.RotateRight;
-import org.nasa.rover.localisation.Coordinates;
-import org.nasa.rover.localisation.Grid;
+import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.factory.CommandGeneratorFactory;
+import org.nasa.rover.localisation.impl.CartesianGrid;
 import org.nasa.rover.localisation.Orientation;
 import org.nasa.rover.localisation.Position;
+import org.nasa.rover.localisation.impl.ManageLatitude;
+import org.nasa.rover.localisation.impl.ManageLongitude;
+import org.nasa.rover.localisation.itf.ICoordinate;
+import org.nasa.rover.localisation.itf.IGrid;
 import org.nasa.rover.rover.IPlanetRover;
 import org.nasa.rover.rover.MarsRover;
 
@@ -21,11 +22,12 @@ public class TestRoverDirections {
 
     private IPlanetRover rover;
 
-    private final int gridSize = 8;
+    private final IGrid iGrid = new CartesianGrid(8, 8, 0);
 
-    private final Grid grid = new Grid(gridSize);
 
-    private Coordinates coordinates;
+    private ICoordinate iLatitude;
+
+    private ICoordinate iLongitude;
 
     private Orientation orientation;
 
@@ -138,12 +140,14 @@ public class TestRoverDirections {
         //given
         String[] inputArray = inputPosition.split(",");
 
-        coordinates = new Coordinates(Integer.parseInt(inputArray[0]),
-                Integer.parseInt(inputArray[1]), grid);
+
+        iLatitude = new ManageLatitude(Integer.parseInt(inputArray[1]), iGrid);
+
+        iLongitude = new ManageLongitude(Integer.parseInt(inputArray[0]), iGrid);
 
         orientation = setOrientation(inputArray[2]);
 
-        position = new Position(coordinates, orientation);
+        position = new Position(iLongitude, iLatitude, orientation);
 
         rover = new MarsRover(position);
 
@@ -151,7 +155,7 @@ public class TestRoverDirections {
         roverInvoker = new RoverNavigationInvoker();
 
 
-        takeCommands(roverInvoker, command);
+        prepareNavigationCommands(roverInvoker, command);
 
         roverInvoker.executeCommand();
 
@@ -164,10 +168,12 @@ public class TestRoverDirections {
 
     @Test
     void whenZeroZeroCoordinatesThenThrowUnsupportedOperationException(){
+        iLatitude = new ManageLatitude(0, iGrid);
 
+        iLongitude = new ManageLongitude(0, iGrid);
 
         IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, () ->
-                new Coordinates(0, 0, grid));
+                new Position(iLongitude, iLatitude, Orientation.NORTH));
 
         Assertions.assertEquals("0,0 coordinates " +
                 "are not valid", thrown.getMessage());
@@ -183,14 +189,10 @@ public class TestRoverDirections {
     }
 
 
-    private void takeCommands(RoverNavigationInvoker executor, String command){
+    private void prepareNavigationCommands(RoverNavigationInvoker executor, String command){
         for (Character stepCommand : command.toCharArray()){
-            switch (stepCommand) {
-                case ('l') -> executor.takeNewCommand(new RotateLeft(rover));
-                case ('r') -> executor.takeNewCommand(new RotateRight(rover));
-                case ('f') -> executor.takeNewCommand(new MoveForward(rover));
-                case ('b') -> executor.takeNewCommand(new MoveBackward(rover));
-            }
+            ICommand iCommand = CommandGeneratorFactory.getCommandToBeAppliedOn(stepCommand, rover);
+            executor.takeNewCommand(iCommand);
         }
     }
 }
