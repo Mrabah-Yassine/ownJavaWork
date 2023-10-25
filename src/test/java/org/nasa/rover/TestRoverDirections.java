@@ -4,9 +4,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.nasa.rover.command.RoverNavigationInvoker;
-import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.application.command.RoverNavigationInvoker;
+import org.nasa.rover.application.command.itf.ICommand;
 import org.nasa.rover.factory.CommandGeneratorFactory;
+import org.nasa.rover.factory.OrientationFactory;
 import org.nasa.rover.localisation.impl.CartesianGrid;
 import org.nasa.rover.localisation.Orientation;
 import org.nasa.rover.localisation.Position;
@@ -140,12 +141,15 @@ public class TestRoverDirections {
         //given
         String[] inputArray = inputPosition.split(",");
 
+        int inputLongitude = Integer.parseInt(inputArray[0]);
+        int inputLatitude = Integer.parseInt(inputArray[1]);
+        String inputOrientation = inputArray[2];
 
-        iLatitude = new ManageLatitude(Integer.parseInt(inputArray[1]), iGrid);
+        iLatitude = new ManageLatitude(inputLatitude, iGrid);
 
-        iLongitude = new ManageLongitude(Integer.parseInt(inputArray[0]), iGrid);
+        iLongitude = new ManageLongitude(inputLongitude, iGrid);
 
-        orientation = setOrientation(inputArray[2]);
+        orientation = OrientationFactory.getOrientationFrom(inputOrientation);
 
         position = new Position(iLongitude, iLatitude, orientation);
 
@@ -160,7 +164,7 @@ public class TestRoverDirections {
         roverInvoker.executeCommand();
 
         //assertions,
-        Assertions.assertEquals(expectedNewPosition, rover.getPosition().value());
+        Assertions.assertEquals(expectedNewPosition, position.value());
 
     }
 
@@ -177,15 +181,6 @@ public class TestRoverDirections {
 
         Assertions.assertEquals("0,0 coordinates " +
                 "are not valid", thrown.getMessage());
-    }
-
-
-    private Orientation setOrientation(String orientation){
-        if(orientation.equals("N")) return Orientation.NORTH;
-        if(orientation.equals("S")) return Orientation.SOUTH;
-        if(orientation.equals("W")) return Orientation.WEST;
-        if(orientation.equals("E")) return Orientation.EAST;
-        throw new IllegalArgumentException("Direction is not identifiable");
     }
 
 

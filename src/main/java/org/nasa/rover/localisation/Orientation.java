@@ -2,72 +2,44 @@ package org.nasa.rover.localisation;
 
 
 public enum Orientation {
-    NORTH("N"),
-    SOUTH("S"),
-    EAST("E"),
-    WEST("W");
-
-    private final String directionValue;
-    private Orientation rightOrientation;
-    private Orientation leftOrientation;
-    private Orientation oppositeOrientation;
-
-    Orientation(String actualDirection) {
-        this.directionValue = actualDirection;
-    }
+    NORTH,
+    SOUTH,
+    EAST,
+    WEST;
 
 
     public Orientation toTheRight() {
-        setRelativeDirections();
-        return rightOrientation;
+        if(this == Orientation.NORTH) return Orientation.EAST;
+        if(this == Orientation.SOUTH) return Orientation.WEST;
+        if(this == Orientation.WEST) return Orientation.NORTH;
+        if(this == Orientation.EAST) return Orientation.SOUTH;
+        throw new IllegalArgumentException("This direction is not known...");
     }
 
     public Orientation toTheLeft() {
-        setRelativeDirections();
-        return leftOrientation;
+        if(this == Orientation.NORTH) return Orientation.WEST;
+        if(this == Orientation.SOUTH) return Orientation.EAST;
+        if(this == Orientation.WEST) return Orientation.SOUTH;
+        if(this == Orientation.EAST) return Orientation.NORTH;
+        throw new IllegalArgumentException("This direction is not known...");
     }
 
     public Orientation toTheOpposite(){
-        setRelativeDirections();
-        return oppositeOrientation;
+        if(this == Orientation.NORTH) return Orientation.SOUTH;
+        if(this == Orientation.SOUTH) return Orientation.NORTH;
+        if(this == Orientation.WEST) return Orientation.EAST;
+        if(this == Orientation.EAST) return Orientation.WEST;
+        throw new IllegalArgumentException("This direction is not known...");
     }
 
-
-    public String value(){
-        return directionValue;
+    @Override
+    public String toString(){
+        return this.name().substring(0,1);
     }
 
     public boolean isEqualTo(Orientation orientation){
         return this.equals(orientation);
     }
 
-
-    private void setRelativeDirections() {
-        switch (this.directionValue) {
-            case "N" -> {
-                rightOrientation = Orientation.EAST;
-                leftOrientation = Orientation.WEST;
-                oppositeOrientation = Orientation.SOUTH;
-            }
-            case "S" -> {
-                rightOrientation = Orientation.WEST;
-                leftOrientation = Orientation.EAST;
-                oppositeOrientation = Orientation.NORTH;
-
-            }
-            case "W" -> {
-                rightOrientation = Orientation.NORTH;
-                leftOrientation = Orientation.SOUTH;
-                oppositeOrientation = Orientation.EAST;
-
-            }
-            case "E" -> {
-                rightOrientation = Orientation.SOUTH;
-                leftOrientation = Orientation.NORTH;
-                oppositeOrientation = Orientation.WEST;
-
-            }
-        }
-    }
 }
 

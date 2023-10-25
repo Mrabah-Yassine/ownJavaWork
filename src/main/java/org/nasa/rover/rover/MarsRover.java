@@ -1,24 +1,8 @@
 package org.nasa.rover.rover;
 
-import org.nasa.rover.localisation.Pole;
 import org.nasa.rover.localisation.Position;
 
-public class MarsRover implements IPlanetRover {
-
-    private final Position position;
-
-    private Pole pole = Pole.NORTH;
-
-
-    public MarsRover(Position position) {
-        this.position = position;
-    }
-
-
-    @Override
-    public Position getPosition() {
-        return position;
-    }
+public record MarsRover(Position position) implements IPlanetRover {
 
 
     @Override

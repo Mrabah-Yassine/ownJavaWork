@@ -1,6 +1,6 @@
-package org.nasa.rover.command;
+package org.nasa.rover.application.command;
 
-import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.application.command.itf.ICommand;
 
 import java.util.LinkedList;
 import java.util.List;

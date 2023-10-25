@@ -1,10 +1,10 @@
 package org.nasa.rover.factory;
 
-import org.nasa.rover.command.impl.MoveBackward;
-import org.nasa.rover.command.impl.MoveForward;
-import org.nasa.rover.command.impl.RotateLeft;
-import org.nasa.rover.command.impl.RotateRight;
-import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.application.command.impl.MoveBackward;
+import org.nasa.rover.application.command.impl.MoveForward;
+import org.nasa.rover.application.command.impl.RotateLeft;
+import org.nasa.rover.application.command.impl.RotateRight;
+import org.nasa.rover.application.command.itf.ICommand;
 import org.nasa.rover.rover.IPlanetRover;
 
 public class CommandGeneratorFactory {

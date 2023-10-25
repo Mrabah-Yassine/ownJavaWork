@@ -1,6 +1,6 @@
-package org.nasa.rover.command.impl;
+package org.nasa.rover.application.command.impl;
 
-import org.nasa.rover.command.itf.ICommand;
+import org.nasa.rover.application.command.itf.ICommand;
 import org.nasa.rover.rover.IPlanetRover;
 
 public class MoveBackward implements ICommand {

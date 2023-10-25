@@ -8,7 +8,7 @@ public class Position {
 
     private final ICoordinate iLatitude;
 
-    public Orientation orientation;
+    private Orientation orientation;
 
     private Pole pole = Pole.NORTH;
 
@@ -21,40 +21,39 @@ public class Position {
 
 
     public String value() {
-        return String.format("%s,%s,%s", iLongitude.toString(), iLatitude.toString(), orientation.value());
+        return String.format("%s,%s,%s", iLongitude.toString(), iLatitude.toString(), orientation.toString());
     }
 
 
     public void forward() {
-        pole = pole.selectPoleFromOrientation(orientation);
 
         if (isVertical()) {
+            pole = pole.selectPoleFromOrientation(orientation);
             updateVerticallyTowards(pole);
             return;
         }
-        if (isRoverOrientedToThe(Orientation.WEST)) {
-            horizontalUpdateTowards(Orientation.WEST);
+        if (isOrientedTo(Orientation.WEST)) {
+            updateHorizontallyTowards(Orientation.WEST);
             return;
         }
-        if (isRoverOrientedToThe(Orientation.EAST)) {
-            horizontalUpdateTowards(Orientation.EAST);
+        if (isOrientedTo(Orientation.EAST)) {
+            updateHorizontallyTowards(Orientation.EAST);
         }
     }
 
     public void backward() {
-        pole = pole.selectPoleFromOrientation(orientation);
 
         if (isVertical()) {
-            pole = pole.toTheOpposite();
+            pole = pole.selectPoleFromOrientation(orientation).toTheOpposite();
             updateVerticallyTowards(pole);
             return;
         }
-        if (isRoverOrientedToThe(Orientation.WEST)) {
-            horizontalUpdateTowards(Orientation.EAST);
+        if (isOrientedTo(Orientation.WEST)) {
+            updateHorizontallyTowards(Orientation.WEST.toTheOpposite());
             return;
         }
-        if (isRoverOrientedToThe(Orientation.EAST)) {
-            horizontalUpdateTowards(Orientation.WEST);
+        if (isOrientedTo(Orientation.EAST)) {
+            updateHorizontallyTowards(Orientation.EAST.toTheOpposite());
         }
     }
 
@@ -76,27 +75,27 @@ public class Position {
         if (iLatitude.isOutOfBounds()) {
             pole = pole.toTheOpposite();
             updateVerticallyTowards(pole);
-            wrapLongitudeVertically();
+            iLongitude.wrap(Direction.VERTICAL);
             orientation = orientation.toTheOpposite();
         }
     }
 
 
-    private void wrapLongitudeVertically() {
-        iLongitude.wrap(Direction.VERTICAL);
-    }
-
-
-    private void horizontalUpdateTowards(Orientation orientation) {
+    private void updateHorizontallyTowards(Orientation orientation) {
         if (orientation.isEqualTo(Orientation.WEST)) {
             iLongitude.decrement();
-            if (iLongitude.isOutOfBounds()) {
-                iLongitude.wrap(Direction.HORIZONTAL);
-            }
+            checkLongitudeBoundsAndWrap();
             return;
         }
         if (orientation.isEqualTo(Orientation.EAST)) {
             iLongitude.increment();
+        }
+    }
+
+
+    private void checkLongitudeBoundsAndWrap(){
+        if (iLongitude.isOutOfBounds()) {
+            iLongitude.wrap(Direction.HORIZONTAL);
         }
     }
 
@@ -122,7 +121,7 @@ public class Position {
         return this.orientation == Orientation.WEST || this.orientation == Orientation.EAST;
     }
 
-    private boolean isRoverOrientedToThe(Orientation orientationToCheck) {
+    private boolean isOrientedTo(Orientation orientationToCheck) {
         return orientation.isEqualTo(orientationToCheck);
     }
 }
