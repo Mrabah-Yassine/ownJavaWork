@@ -1,4 +1,4 @@
-package org.nasa.rover.application.command.itf;
+package org.nasa.rover.domain.application.commands;
 
 public interface ICommand {
 

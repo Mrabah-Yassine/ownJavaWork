@@ -1,4 +1,4 @@
-package org.nasa.rover.localisation;
+package org.nasa.rover.domain.entities.localisation;
 
 public enum Direction {
 

@@ -1,6 +1,6 @@
-package org.nasa.rover.factory;
+package org.nasa.rover.domain.application.localisation;
 
-import org.nasa.rover.localisation.Orientation;
+import org.nasa.rover.domain.entities.localisation.Orientation;
 
 public class OrientationFactory {
 

@@ -1,8 +1,8 @@
-package org.nasa.rover.localisation.impl;
+package org.nasa.rover.domain.application.localisation;
 
-import org.nasa.rover.localisation.Direction;
-import org.nasa.rover.localisation.itf.ICoordinate;
-import org.nasa.rover.localisation.itf.IGrid;
+import org.nasa.rover.domain.entities.localisation.Direction;
+import org.nasa.rover.domain.entities.localisation.ICoordinate;
+import org.nasa.rover.domain.entities.grid.IGrid;
 
 public class ManageLongitude implements ICoordinate {
 

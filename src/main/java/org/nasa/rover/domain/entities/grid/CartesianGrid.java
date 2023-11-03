@@ -1,6 +1,4 @@
-package org.nasa.rover.localisation.impl;
-
-import org.nasa.rover.localisation.itf.IGrid;
+package org.nasa.rover.domain.entities.grid;
 
 public class CartesianGrid implements IGrid {
 

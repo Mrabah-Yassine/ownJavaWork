@@ -1,6 +1,4 @@
-package org.nasa.rover.localisation.itf;
-
-import org.nasa.rover.localisation.Direction;
+package org.nasa.rover.domain.entities.localisation;
 
 public interface ICoordinate {
 

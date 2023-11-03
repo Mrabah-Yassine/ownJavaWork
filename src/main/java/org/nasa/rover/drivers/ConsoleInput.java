@@ -1,15 +1,13 @@
-package org.nasa.rover.application.view;
+package org.nasa.rover.drivers;
 
-import org.nasa.rover.application.Request.IRequest;
+import org.nasa.rover.controller.IInput;
 
 import java.util.Scanner;
 
-public class InputCommandsOnKeyboard {
+public class ConsoleInput {
 
+    private IInput iInput;
 
-    public void send(IRequest iRequest){
-        iRequest.create();
-    }
 
     public String getUserInputs() {
         Scanner scanner = new Scanner(System.in);

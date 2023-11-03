@@ -1,7 +1,6 @@
-package org.nasa.rover.application.command.impl;
+package org.nasa.rover.domain.application.commands;
 
-import org.nasa.rover.application.command.itf.ICommand;
-import org.nasa.rover.rover.IPlanetRover;
+import org.nasa.rover.domain.application.IPlanetRover;
 
 public class RotateLeft implements ICommand {
 

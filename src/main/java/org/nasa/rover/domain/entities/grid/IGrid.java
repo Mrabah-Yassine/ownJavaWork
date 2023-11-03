@@ -1,4 +1,4 @@
-package org.nasa.rover.localisation.itf;
+package org.nasa.rover.domain.entities.grid;
 
 public interface IGrid {
     int height();

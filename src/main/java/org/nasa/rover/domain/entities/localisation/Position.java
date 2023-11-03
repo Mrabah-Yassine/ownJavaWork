@@ -1,6 +1,4 @@
-package org.nasa.rover.localisation;
-
-import org.nasa.rover.localisation.itf.ICoordinate;
+package org.nasa.rover.domain.entities.localisation;
 
 public class Position {
 

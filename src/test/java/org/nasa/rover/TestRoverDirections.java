@@ -4,19 +4,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.nasa.rover.application.command.RoverNavigationInvoker;
-import org.nasa.rover.application.command.itf.ICommand;
-import org.nasa.rover.factory.CommandGeneratorFactory;
-import org.nasa.rover.factory.OrientationFactory;
-import org.nasa.rover.localisation.impl.CartesianGrid;
-import org.nasa.rover.localisation.Orientation;
-import org.nasa.rover.localisation.Position;
-import org.nasa.rover.localisation.impl.ManageLatitude;
-import org.nasa.rover.localisation.impl.ManageLongitude;
-import org.nasa.rover.localisation.itf.ICoordinate;
-import org.nasa.rover.localisation.itf.IGrid;
-import org.nasa.rover.rover.IPlanetRover;
-import org.nasa.rover.rover.MarsRover;
+import org.nasa.rover.controller.RoverController;
+import org.nasa.rover.controller.CommandRequester;
+import org.nasa.rover.domain.application.localisation.OrientationFactory;
+import org.nasa.rover.domain.entities.localisation.Orientation;
+import org.nasa.rover.domain.entities.localisation.Position;
+import org.nasa.rover.domain.entities.grid.CartesianGrid;
+import org.nasa.rover.domain.application.localisation.ManageLatitude;
+import org.nasa.rover.domain.application.localisation.ManageLongitude;
+import org.nasa.rover.domain.entities.localisation.ICoordinate;
+import org.nasa.rover.domain.entities.grid.IGrid;
+import org.nasa.rover.domain.application.IPlanetRover;
+import org.nasa.rover.domain.application.MarsRover;
 
 
 public class TestRoverDirections {
@@ -33,8 +32,6 @@ public class TestRoverDirections {
     private Orientation orientation;
 
     private Position position;
-
-    private RoverNavigationInvoker roverInvoker;
 
 
     @ParameterizedTest(name = "{index} => inputPosition={0}, command={1}, expectedNewPosition={2}")
@@ -156,12 +153,12 @@ public class TestRoverDirections {
         rover = new MarsRover(position);
 
         //when
-        roverInvoker = new RoverNavigationInvoker();
+        CommandRequester roverCommandsFactory = new CommandRequester(command, rover);
 
 
-        prepareNavigationCommands(roverInvoker, command);
+        RoverController marsRoverController = new RoverController(roverCommandsFactory);
 
-        roverInvoker.executeCommand();
+        marsRoverController.execute();
 
         //assertions,
         Assertions.assertEquals(expectedNewPosition, position.value());
@@ -181,13 +178,5 @@ public class TestRoverDirections {
 
         Assertions.assertEquals("0,0 coordinates " +
                 "are not valid", thrown.getMessage());
-    }
-
-
-    private void prepareNavigationCommands(RoverNavigationInvoker executor, String command){
-        for (Character stepCommand : command.toCharArray()){
-            ICommand iCommand = CommandGeneratorFactory.getCommandToBeAppliedOn(stepCommand, rover);
-            executor.takeNewCommand(iCommand);
-        }
     }
 }

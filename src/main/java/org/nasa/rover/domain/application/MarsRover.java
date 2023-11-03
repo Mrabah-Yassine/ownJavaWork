@@ -1,6 +1,6 @@
-package org.nasa.rover.rover;
+package org.nasa.rover.domain.application;
 
-import org.nasa.rover.localisation.Position;
+import org.nasa.rover.domain.entities.localisation.Position;
 
 public record MarsRover(Position position) implements IPlanetRover {
 

@@ -1,4 +1,4 @@
-package org.nasa.rover.rover;
+package org.nasa.rover.domain.application;
 
 public interface IPlanetRover {
 
